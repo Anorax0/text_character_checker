@@ -1,137 +1,195 @@
-# Wyszukiwuje pliki tekstowe w aktualnym katalogu
+import json
+
+
+# Loads lexicons
+def load_word(lexicon) -> dict:
+    """
+    Reads a dictionary from a json file.
+    :return: Dict with words from a dictionary: {word: 1}
+    """
+    try:
+        with open(f'{lexicon}-words.json', 'r', encoding='UTF-8') as lexicon_file:
+            words = json.load(lexicon_file)
+            return words
+    except FileNotFoundError as e:
+        print("Dictionary file not found.", e)
+    except Exception as e:
+        print(e)
+
+
+# importing lexicons in json format
+positives = load_word('positive')
+negatives = load_word('negative')
+neutrals = load_word('neutral')
+
+
+# searching for txt files in folder
 def search_for_text():
-    import os, fnmatch, time
-    print('Wykryto powyższe teksty w katalogu:')
-    time.sleep(0.5)
-    listOfFiles = os.listdir('.')
+    """
+    Shows available files in .txt format in the current folder apart from lexicons
+    A user has to select one of them
+    The chosen text file is being processed in the next steps
+    :return: string(text)
+    """
+    import os
+    import fnmatch
+    print('Found files:')
+    list_of_files = os.listdir('.')
     pattern = "*.txt"
-    for entry in listOfFiles:
+    excluded_files = ['negative-words.json', 'neutral-words.json', 'positive-words.txt']
+    for entry in list_of_files:
         if fnmatch.fnmatch(entry, pattern):
-            print(entry)
-    choosen_text = input('Który z tych tekstów chcesz wczytać?')
-    return str(choosen_text)
-
-# Wybieranie pliku tekstowego do dalszej obróbki
-def choose_text():
-    choosen_text = input('Który z powyższych plików tekstowych chcesz wybrać? [nazwa.txt] \n')
-    if choosen_text == 'positive-words.txt' or choosen_text == 'negative-words.txt':
-        exit('Błąd dostępu. Program zakończono.')
+            if entry not in excluded_files:
+                print(entry)
+    choosen_text = input('Which one do you what to work with?')
+    if choosen_text in excluded_files:
+        exit('Permission denied. Program closed.')
     return str(choosen_text)
 
 
-# Wyświetla wczytany tekst z oryginalnym formatowaniem
+# Nobody knows why its here, not in main file...
 def show_text(argument):
+    """
+    Shows unformatted text
+    :param argument: processing text -> str
+    :return: str
+    """
     print(argument, '\n' * 2)
 
-# Dzieli wczytany tekst na zdania i je numeruje
+
 def show_sent(argument):
-    x = 1
-    for sentence in argument:
+    """
+    Shows splitted text in sentences with numeration
+    :param argument: processing text -> str
+    :return: str
+    """
+    for index, sentence in enumerate(argument):
         if sentence[0].isupper() and (sentence[-1] == '.' or '?' or '!'):
-            print(x, sentence)
-            x += 1
+            print(index, sentence)
 
-# Kolejne 4 funkcje sprawdzają jakie są negatywne i pozytywne słowa
-# Oraz sprawdzają ich ilość
-def check_positives(argument):
-    l_file = open(r'positive-words.txt', 'r', encoding='UTF-8')
-    f = l_file.read()
-    lex = f.split()
-    i = [i for i in argument if i in lex]
-    i = list(set(i))
-    return i
 
-def check_negatives(argument):
-    l_file = open(r'negative-words.txt', 'r', encoding='UTF-8')
-    f = l_file.read()
-    lex = f.split()
-    i = [i for i in argument if i in lex]
-    i = list(set(i))
-    return i
+# Checks character of words in text
+def check_words_character(character, text):
+    """
+    Checks character of words in the text
+    :param character: name of a lexicon -> str
+    :param text: processing text -> str
+    :return:
+    """
+    if character == 'positives':
+        lexicon = positives
+    elif character == 'negatives':
+        lexicon = negatives
+    else:
+        return None
+    i = [i for i in text if i in lexicon.keys()]
+    return list(set(i))
 
-def count_positives(argument):
-    j = 0
-    for spam in argument:
-        if spam in check_positives(argument):
-            j += 1
-    return j
 
-def count_negatives(argument):
-    j = 0
-    for spam in argument:
-        if spam in check_negatives(argument):
-            j += 1
-    return j
+def count_char_words(lexicon, text):
+    """
+    Counts words in the splitted text based on a chosen lexicon
+    :param lexicon: str
+    :param text: tuple str
+    :return: int
+    """
+    number = 0
+    for spam in text:
+        if spam in check_words_character(lexicon, text):
+            number += 1
+    return number
 
-# Liczy ilość słów niesklasyfikowanych w leksykonach
-def count_nochar(argument):
-    p_file = open(r'positive-words.txt', 'r', encoding='UTF-8')
-    p = p_file.read()
-    po = p.split()
-    n_file = open(r'negative-words.txt', 'r', encoding='UTF-8')
-    n = n_file.read()
-    no = n.split()
-    neu_file = open(r'negative-words.txt', 'r', encoding='UTF-8')
-    neu = n_file.read()
-    neut = n.split()
 
-    a = [a for a in argument if a.lower() not in po and a.lower() not in no and a.lower() not in neut]
-    print(f'10 pierwszych niesklasyfikowanych słów: {list(set(a[:10]))}')
+# Counting unclassified words
+def count_nochar(argument, number):
+    pos = positives.keys()
+    neg = negatives.keys()
+
+    a = [a for a in argument if a.lower() not in pos and a.lower() not in neg]
+    print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
     z = 0
     for word in argument:
-        if word not in po:
-            if word not in no:
+        if word not in pos:
+            if word not in neg:
                 z += 1
     return z
 
-# liczy ilość słów
+
+# Counting words in text
 def count_words(argument):
-    z = 0
-    for word in argument:
-        z += 1
-    return z
+    """
+    Counts words in the splitted text
+    :param argument: tuple str
+    :return: int
+    """
+    return len(argument)
 
-# Sprawdza w którym leksykonie jest dane słowo
+
+# Checks character of word
 def check_char(word):
-    pos = open(r'positive-words.txt', 'r', encoding='UTF-8').read().split()
-    neg = open(r'negative-words.txt', 'r', encoding='UTF-8').read().split()
-    non = open(r'neutral-words.txt', 'r', encoding='UTF-8').read().split()
-    if word in pos:
-        return 'pos'
-    elif word in neg:
-        return 'neg'
-    elif word in non:
-        return 'non'
+    if word in positives.keys():
+        return 'positive'
+    elif word in negatives.keys():
+        return 'negative'
+    elif word in neutrals.keys():
+        return 'neutral'
     else:
-        return 'Error'
+        return 'null'
 
-# Sprawdza charakter słowa i sprawa info, o charakterze
+
+# Check character of word and shows info about it
 def show_char(word):
     word = word.lower()
     check = check_char(word)
-    if check == 'pos':
-        return f'Słowo {word} ma charakter pozytywny.'
-    elif check == 'neg':
-        return  f'Słowo {word} ma charakter negatywny.'
-    elif check == 'non':
-        return  f'Słowo {word} ma charakter neutralny.'
-    elif check == 'Error':
-        return f'Słowo {word} nie występuje w leksykonie. \n  Jeśli chcesz dodać słowo do leksykonu => wybierz "D"'
+    if check == 'positive':
+        return f'The word <{word}> has a positive character.'
+    elif check == 'negative':
+        return f'The word {word} has a negative character.'
+    elif check == 'neutral':
+        return f'The word {word} has a neutral character.'
+    elif check == 'null':
+        return f'The word {word} is not found in any lexicon. \n ' \
+               f'Would you like to add this word to a lexicon? => type "D"'
     else:
-        return 'Wystąpił jakiś błąd.'
+        return 'Unexpected error.'
 
-# Dodaje słowo do wybranego leksykonu
+
+#  Adding word to suitable lexicon
 def adding(word, leks):
-    word, leks = word.lower(), leks.lower()
-    if leks == 'pos':
-        file = open(r'positive-words.txt', 'a', encoding='UTF-8')
-        file.write(f'\n{word}')
-        return f'Słowo {word} zostało dodane do leksykonu słów pozytywnych.'
-    elif leks == 'neg':
-        file = open(r'negative-words.txt', 'a', encoding='UTF-8')
-        file.write(f'\n{word}')
-        return f'Słowo {word} zostało dodane do leksykonu słów negatywnych.'
-    elif leks == 'non':
-        file = open(r'neutral-words.txt', 'a', encoding='UTF-8')
-        file.write(f'\n{word}')
-        return f'Słowo {word} zostało dodane do leksykonu słów neutralnych.'
+    """
+    Checks if the word exists in any lexicon, if not - adds it as a new record to a suitable json file
+    :param word: str
+    :param leks: str
+    :return: str
+    """
+    new_word = {word: 1}
+    if leks == 'positive':
+        with open('positive-words.json') as load_positive_json:
+            positive_data = json.load(load_positive_json)
+        positive_data.update(new_word)
+        with open('positive-words.json', 'w') as positive_json:
+            json.dump(positive_data, positive_json)
+        return f'The word <{word}> has been added to the positive words lexicon.'
+
+    elif leks == 'negative':
+        with open('negative-words.json') as load_negative_json:
+            negative_data = json.load(load_negative_json)
+        negative_data.update(new_word)
+        with open('negative-words.json', 'w') as negative_json:
+            json.dump(negative_data, negative_json)
+        return f'The word <{word}> has been added to the negative words lexicon.'
+
+    elif leks == 'neutral':
+        with open('neutral-words.json') as load_neutral_json:
+            neutral_data = json.load(load_neutral_json)
+            neutral_data.update(new_word)
+        with open('neutral-words.json', 'w') as neutral_json:
+            json.dump(neutral_data, neutral_json)
+        return f'The word <{word}> has been added to the neutral words lexicon.'
+
+    else:
+        return 'Unexpected error while adding word to the lexicon.'
+
+
+if __name__ == '__main__':
+    pass

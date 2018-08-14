@@ -1,69 +1,88 @@
-from functions import *
+from text_character_checker.functions import *
+from nltk import sent_tokenize
+from time import time
 
+chosen_text = None
 opt = None
-choosen_text = ''
 
-if choosen_text == '':
-    file = open(str(search_for_text()), 'r', encoding='UTF-8')
-    f = file.read()
-    file_text = f.split()
-    from nltk.tokenize import sent_tokenize
-    text = sent_tokenize(f)
-else:
-    exit('Niespodziewany błąd podczas wczytywania pliku tekstowego.')
+if not chosen_text:
+    try:
+        with open(str(search_for_text()), 'r', encoding='UTF-8') as file:
+            f = file.read()
+            file_text = f.split()
+            text = sent_tokenize(f)
+    except FileNotFoundError:
+        exit(f'File not found. Program closed')
 
-while opt != 'exit':
-    opt = input(f"""\nDostępne opcje przetwarzania wczytanego tekstu [{file.name}]:
-                A: Wyświetl tekst.
-                B: Charakter tekstu (pozytywny/negatywny/neutralny).
-                C: Wyświetl słowa niesklasyfikowane pod względem nacechowania.
-                D: Dodaj słowo do leksykonu.
-                E: Sprawdź nacechowanie podanego słowa.
-                Powiedz co chcesz zrobić? \n
-                 Wpisz exit aby zakończyć działanie programu""")
-    print('\n')
-    opt = opt.lower()
-
-# Pokazuje cały tekst z oryginalnym formatowaniem
-    if opt == 'a':
-        show_text(f)
-        opt = input('Czy chcesz wyświetlić tekst z podziałem na zdania? [T/N]')
+    while opt != 'exit':
+        opt = input(f"""\nAvailable options for text processing [{file.name}]:
+                        A: Display the text.
+                        B: Display the character of the text (positive/negative/neutral).
+                        C: Display unclassified words.
+                        D: Add a word to the lexicon.
+                        E: Check the character of the word.
+                        What would you like to do? \n
+                        Type <exit> to close the program""")
+        print('\n')
         opt = opt.lower()
-        if opt == 't':
-            show_sent(text)
-            continue
 
-# Sprawdza tekst i pokazuje czy jest poz., neg. w procentach i % słów neutralnych oraz ilość słów niesklasyfikowanych
-    elif opt == 'b':
-        print(f'Słowa pozytywne to: {check_positives(file_text)}')
-        print(f'Słowa negatywne to: {check_negatives(file_text)}')
-        print(f'Jest {count_nochar(file_text)} niesklasyfikowanych.')
-        z = count_words(file_text)
-        x = (count_positives(file_text) / z) * 100
-        y = (count_negatives(file_text) / z) * 100
-        print(f'Słowa pozytywne stanowią {round(x, 2)}% tekstu, natomiast słowa negatywne to {round(y,2)}% tekstu.' )
-# Wyświetla słowa niesklasyfikiwane
-    elif opt == 'c':
-        print(r'10 pierwszych wyrazów, które się są sklasyfikowane w leksykowanach:')
-        print(f'Jest {count_nochar(file_text)} niesklasyfikowanych słów.')
+        # Displays text with original formatting
+        if opt == 'a':
+            time_start = time()
+            show_text(f)
+            print(f'\nExecuting time: {time() - time_start:.6f}')
+            opt = input('Would you like to display the text divided into sentences? [T/N]')
+            opt = opt.lower()
+            if opt == 't':
+                time_start = time()
+                show_sent(text)
+                print(f'\nExecuting time: {time() - time_start:.6f}')
+                continue
 
-# Możliwość dodania nowego słowa do leksykonu i określenia jego nacechowania
-    elif opt == 'd':
-        word_check = input('Jakie słowo chcesz dodać? \n')
-        if check_char(word_check) == 'Error':
-            add_char = input(f'Jakie charakter ma słowo {word_check}? Pozytywny (wpisz pos) / negatywny (wpisz neg) czy neutralny (wpisz non)')
-            print(adding(word_check, add_char))
-        else:
-            print('Słowo jest już dodane z leksykonów.')
+        # Shows character of the text and shows percentage of positive and negatives words
+        # Shows ten first positive and negative words
+        # Shows ten first unclassified words
+        # Shows percentage of positive and negative words in text
+        elif opt == 'b':
+            time_start = time()
+            print(f'Positive words:: {", ".join(check_words_character("positives", file_text))}')
+            print(f'Negative words: {", ".join(check_words_character("negatives", file_text))}')
+            print(f'There are {count_nochar(file_text, 10)} unclassified words.')
+            z = count_words(file_text)
+            x = (count_char_words('positives', file_text) / z) * 100
+            y = (count_char_words('negatives', file_text) / z) * 100
+            print(f'Positive words: {round(x, 2)}% of the text; negative words: {round(y,2)}% of the text.')
+            print(f'\nExecuting time: {time() - time_start:.6f}')
 
-# Sprawdza nacechowanie podanego słowa, jeśli jest dostępne w leksykonie
-    elif opt == 'e':
-        word = input('Wpisz słowo, którego charakter chcesz sprawdzić:')
-        print(show_char(str(word)))
-# Kończy działanie programu
-    elif opt == 'exit':
-        print('Program zakończono.')
-        break
+        # Shows unclassified words
+        elif opt == 'c':
+            time_start = time()
+            print(f'There are {count_nochar(file_text, 30)} unclassified words.')
+            print(f'\nExecuting time: {time() - time_start:.6f}')
 
-file.close()
+        # Adding word to suitable lexicon
+        elif opt == 'd':
+            word_check = input('Which word would you like to add? \n')
+            if check_char(word_check) == 'null':
+                add_char = input(
+                    f'What character does a word <{word_check}> have?\nPositive? [input positive]'
+                    f'\nNegative? [input negative]\nNeutral? [input neutral')
+                time_start = time()
+                print(adding(word_check, add_char))
+                print(f'\nExecuting time: {time() - time_start:.6f}')
+            else:
+                print('The word is already in the lexicon.')
 
+        # Checks character of the word if it is in lexicon
+        elif opt == 'e':
+            word = input('Write a word which you want to check:')
+            time_start = time()
+            print(show_char(str(word)))
+            print(f'\nExecuting time: {time() - time_start:.6f}')
+        # Stops the program
+        elif opt == 'exit':
+            print('Program closed.')
+
+
+else:
+    exit('Unexpected problem while opening text file.')
