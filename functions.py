@@ -2,13 +2,13 @@ import json
 
 
 # Loads lexicons
-def load_word(lexicon) -> dict:
+def load_lexicon() -> dict:
     """
     Reads a dictionary from a json file.
     :return: Dict with words from a dictionary: {word: 1}
     """
     try:
-        with open(f'{lexicon}-words.json', 'r', encoding='UTF-8') as lexicon_file:
+        with open('lexicon.json', 'r', encoding='UTF-8') as lexicon_file:
             words = json.load(lexicon_file)
             return words
     except FileNotFoundError as e:
@@ -18,9 +18,7 @@ def load_word(lexicon) -> dict:
 
 
 # importing lexicons in json format
-positives = load_word('positive')
-negatives = load_word('negative')
-neutrals = load_word('neutral')
+lexicon = load_lexicon()
 
 
 # searching for txt files in folder
@@ -77,9 +75,9 @@ def check_words_character(character, text):
     :return:
     """
     if character == 'positives':
-        lexicon = positives
+        lexicon = 'positives'
     elif character == 'negatives':
-        lexicon = negatives
+        lexicon = 'negatives'
     else:
         return None
     i = [i for i in text if i in lexicon.keys()]
@@ -102,8 +100,8 @@ def count_char_words(lexicon, text):
 
 # Counting unclassified words
 def count_nochar(argument, number):
-    pos = positives.keys()
-    neg = negatives.keys()
+    pos = lexicon['positive'].keys()
+    neg = lexicon['negative'].keys()
 
     a = [a for a in argument if a.lower() not in pos and a.lower() not in neg]
     print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
@@ -127,11 +125,11 @@ def count_words(argument):
 
 # Checks character of word
 def check_char(word):
-    if word in positives.keys():
+    if word in lexicon['positive'].keys():
         return 'positive'
-    elif word in negatives.keys():
+    elif word in lexicon['negative'].keys():
         return 'negative'
-    elif word in neutrals.keys():
+    elif word in lexicon['neutral'].keys():
         return 'neutral'
     else:
         return 'null'
@@ -155,38 +153,22 @@ def show_char(word):
 
 
 #  Adding word to suitable lexicon
-def adding(word, leks):
+def adding(word, lexicon):
     """
-    Checks if the word exists in any lexicon, if not - adds it as a new record to a suitable json file
+    Checks if the word exists in any lexicon, if not - adds it as a new record to the json file
     :param word: str
-    :param leks: str
+    :param lexicon: str
     :return: str
     """
     new_word = {word: 1}
-    if leks == 'positive':
-        with open('positive-words.json') as load_positive_json:
-            positive_data = json.load(load_positive_json)
-        positive_data.update(new_word)
-        with open('positive-words.json', 'w') as positive_json:
-            json.dump(positive_data, positive_json)
-        return f'The word <{word}> has been added to the positive words lexicon.'
-
-    elif leks == 'negative':
-        with open('negative-words.json') as load_negative_json:
-            negative_data = json.load(load_negative_json)
-        negative_data.update(new_word)
-        with open('negative-words.json', 'w') as negative_json:
-            json.dump(negative_data, negative_json)
-        return f'The word <{word}> has been added to the negative words lexicon.'
-
-    elif leks == 'neutral':
-        with open('neutral-words.json') as load_neutral_json:
-            neutral_data = json.load(load_neutral_json)
-            neutral_data.update(new_word)
-        with open('neutral-words.json', 'w') as neutral_json:
-            json.dump(neutral_data, neutral_json)
-        return f'The word <{word}> has been added to the neutral words lexicon.'
-
+    available_lexicons = ['positive', 'negative', 'neutral']
+    if lexicon in available_lexicons:
+        with open('lexicon.json') as load_json:
+            data = json.load(load_json)
+        data[lexicon].update(new_word)
+        with open('lexicon.json', 'w') as dump_json:
+            json.dump(data, dump_json)
+            return f'The word <{new_word}> has been added to the {lexicon}  words lexicon.'
     else:
         return 'Unexpected error while adding word to the lexicon.'
 
