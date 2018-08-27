@@ -1,4 +1,4 @@
-from text_character_checker.functions import *
+from functions import *
 from nltk import sent_tokenize
 from time import time
 
