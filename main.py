@@ -22,8 +22,8 @@ if not chosen_text:
                         D: Add a word to the lexicon.
                         E: Check the character of the word.
                         What would you like to do? \n
-                        Type <exit> to close the program.\n""")
-
+                        Type <exit> to close the program""")
+        print('\n')
         opt = opt.lower()
 
         # Displays text with original formatting
