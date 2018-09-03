@@ -197,7 +197,7 @@ def add_new_text(text, title):
     :param title: str
     :return: boolean
     """
-    # to do
+    # to do later...
 
 if __name__ == '__main__':
     pass
