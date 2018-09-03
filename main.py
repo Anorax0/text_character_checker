@@ -79,6 +79,12 @@ if not chosen_text:
             time_start = time()
             print(show_char(str(word)))
             print(f'\nExecuting time: {time() - time_start:.6f}')
+        elif opt == 'f':
+            new_text_title = input('Input title for the text you want to add.')
+            new_text = input('Input here the text you want to add to the local library for future analyze:')
+            time_start = time()
+            add_new_text(new_text, title)
+            print(f'\nExecuting time: {time() - time_start:.6f}')
         # Stops the program
         elif opt == 'exit':
             print('Program closed.')
