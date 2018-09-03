@@ -195,6 +195,8 @@ def adding(word, leks):
     else:
         return 'Unexpected error while adding word to the lexicon.'
 
+
+# TO DO LATER
 # def add_new_text(text, title):
 #     """
 #     Allows to add the new text to local library as txt for future analyze
