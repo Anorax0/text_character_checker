@@ -2,13 +2,13 @@ import json
 
 
 # Loads lexicons
-def load_word(lexicon) -> dict:
+def load_word() -> dict:
     """
     Reads a dictionary from a json file.
     :return: Dict with words from a dictionary: {word: 1}
     """
     try:
-        with open(f'{lexicon}-words.json', 'r', encoding='UTF-8') as lexicon_file:
+        with open('lexicon.json', 'r', encoding='UTF-8') as lexicon_file:
             words = json.load(lexicon_file)
             return words
     except FileNotFoundError as e:
@@ -18,9 +18,10 @@ def load_word(lexicon) -> dict:
 
 
 # importing lexicons in json format
-positives = load_word('positive')
-negatives = load_word('negative')
-neutrals = load_word('neutral')
+loaded_json_file = load_word()
+positives = loaded_json_file['positive'].keys()
+negatives = loaded_json_file['negative'].keys()
+neutrals = loaded_json_file['neutral'].keys()
 
 
 # searching for txt files in folder
@@ -82,7 +83,7 @@ def check_words_character(character, text):
         lexicon = negatives
     else:
         return None
-    i = [i for i in text if i in lexicon.keys()]
+    i = [i for i in text if i in lexicon]
     return list(set(i))
 
 
@@ -102,8 +103,8 @@ def count_char_words(lexicon, text):
 
 # Counting unclassified words
 def count_nochar(argument, number):
-    pos = positives.keys()
-    neg = negatives.keys()
+    pos = positives
+    neg = negatives
 
     a = [a for a in argument if a.lower() not in pos and a.lower() not in neg]
     print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
@@ -127,11 +128,11 @@ def count_words(argument):
 
 # Checks character of word
 def check_char(word):
-    if word in positives.keys():
+    if word in positives:
         return 'positive'
-    elif word in negatives.keys():
+    elif word in negatives:
         return 'negative'
-    elif word in neutrals.keys():
+    elif word in neutrals:
         return 'neutral'
     else:
         return 'null'
@@ -153,6 +154,10 @@ def show_char(word):
     else:
         return 'Unexpected error.'
 
+
+###########################################################
+# TO DO: Refactor function - use one json, not three of them
+###########################################################
 
 #  Adding word to suitable lexicon
 def adding(word, leks):
@@ -190,14 +195,15 @@ def adding(word, leks):
     else:
         return 'Unexpected error while adding word to the lexicon.'
 
-def add_new_text(text, title):
-    """
-    Allows to add the new text to local library as txt for future analyze
-    :param text: str
-    :param title: str
-    :return: boolean
-    """
-    # to do later...
+# def add_new_text(text, title):
+#     """
+#     Allows to add the new text to local library as txt for future analyze
+#     :param text: str
+#     :param title: str
+#     :return: boolean
+#     """
+#     # to do later...
+
 
 if __name__ == '__main__':
     pass
