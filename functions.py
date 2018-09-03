@@ -106,7 +106,8 @@ def count_nochar(argument, number):
     pos = positives
     neg = negatives
 
-    a = [a for a in argument if a.lower() not in pos and a.lower() not in neg]
+    stop_words = ['-', ',', '(', ')']
+    a = [a for a in argument if a.lower() not in pos and a.lower() not in neg and a.lower() not in stop_words]
     print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
     z = 0
     for word in argument:
