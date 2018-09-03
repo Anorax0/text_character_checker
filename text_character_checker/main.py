@@ -21,6 +21,7 @@ if not chosen_text:
                         C: Display unclassified words.
                         D: Add a word to the lexicon.
                         E: Check the character of the word.
+                        F: Add new text to the local library.
                         What would you like to do? \n
                         Type <exit> to close the program""")
         print('\n')
@@ -78,6 +79,12 @@ if not chosen_text:
             word = input('Write a word which you want to check:')
             time_start = time()
             print(show_char(str(word)))
+            print(f'\nExecuting time: {time() - time_start:.6f}')
+        elif opt == 'f':
+            new_text_title = input('Input title for the text you want to add.')
+            new_text = input('Input here the text you want to add to the local library for future analyze:')
+            time_start = time()
+            add_new_text(new_text, title)
             print(f'\nExecuting time: {time() - time_start:.6f}')
         # Stops the program
         elif opt == 'exit':
