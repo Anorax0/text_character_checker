@@ -202,7 +202,6 @@ def adding(word, leks):
 #     :param title: str
 #     :return: boolean
 #     """
-#     # to do later...
 
 
 if __name__ == '__main__':
