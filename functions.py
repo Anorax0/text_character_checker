@@ -188,4 +188,4 @@ def adding(word, leks):
 
 
 if __name__ == '__main__':
-    print(adding('bob', 'positive'))
+    pass
