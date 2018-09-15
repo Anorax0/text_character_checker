@@ -1,2 +1,4 @@
-# nl-checker
-Natural language checker for the positive and the negative word based on lexycons.
+# Natural Character Checker
+Natural language checker for positive, negative and neutral words based on lexicons.
+
+Script is made for learning purpose.
