@@ -156,10 +156,6 @@ def show_char(word):
         return 'Unexpected error.'
 
 
-###########################################################
-# TO DO: Refactor function - use one json, not three of them
-###########################################################
-
 #  Adding word to suitable lexicon
 def adding(word, leks):
     """
@@ -169,30 +165,14 @@ def adding(word, leks):
     :return: str
     """
     new_word = {word: 1}
-    if leks == 'positive':
-        with open('positive-words.json') as load_positive_json:
-            positive_data = json.load(load_positive_json)
-        positive_data.update(new_word)
-        with open('positive-words.json', 'w') as positive_json:
-            json.dump(positive_data, positive_json)
-        return f'The word <{word}> has been added to the positive words lexicon.'
-
-    elif leks == 'negative':
-        with open('negative-words.json') as load_negative_json:
-            negative_data = json.load(load_negative_json)
-        negative_data.update(new_word)
-        with open('negative-words.json', 'w') as negative_json:
-            json.dump(negative_data, negative_json)
-        return f'The word <{word}> has been added to the negative words lexicon.'
-
-    elif leks == 'neutral':
-        with open('neutral-words.json') as load_neutral_json:
-            neutral_data = json.load(load_neutral_json)
-            neutral_data.update(new_word)
-        with open('neutral-words.json', 'w') as neutral_json:
-            json.dump(neutral_data, neutral_json)
-        return f'The word <{word}> has been added to the neutral words lexicon.'
-
+    lexicon_dicts = ['positive', 'negative', 'neutral']
+    if leks in lexicon_dicts:
+        with open('lexicon.json', 'r+') as json_file:
+            lexicon = json.load(json_file)
+            lexicon[leks].update(new_word)
+        with open('lexicon.json', 'w') as updated_json_file:
+            json.dump(lexicon, updated_json_file)
+        return f'The word {word} has been added to the {leks} words lexicon'
     else:
         return 'Unexpected error while adding word to the lexicon.'
 
@@ -208,4 +188,4 @@ def adding(word, leks):
 
 
 if __name__ == '__main__':
-    pass
+    print(adding('bob', 'positive'))
