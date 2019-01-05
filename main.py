@@ -1,4 +1,4 @@
-from text_character_checker.functions import *
+from functions import *
 from nltk import sent_tokenize
 from time import time
 
@@ -48,7 +48,9 @@ if not chosen_text:
             time_start = time()
             print(f'Positive words:: {", ".join(check_words_character("positives", file_text))}')
             print(f'Negative words: {", ".join(check_words_character("negatives", file_text))}')
-            print(f'There are {count_nochar(file_text, 10)} unclassified words.')
+            number_unclassified, unique_list = count_nochar(file_text)
+            print(f'There are {number_unclassified} unclassified words.')
+            print(f'10 first unclassified words: {unique_list[:10]}')
             z = count_words(file_text)
             x = (count_char_words('positives', file_text) / z) * 100
             y = (count_char_words('negatives', file_text) / z) * 100
@@ -58,7 +60,7 @@ if not chosen_text:
         # Shows unclassified words
         elif opt == 'c':
             time_start = time()
-            print(f'There are {count_nochar(file_text, 30)} unclassified words.')
+            print(f'There are {count_nochar(file_text)} unclassified words.')
             print(f'\nExecuting time: {time() - time_start:.6f}')
 
         # Adding word to suitable lexicon

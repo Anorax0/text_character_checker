@@ -37,7 +37,7 @@ def search_for_text():
     print('Found files:')
     list_of_files = os.listdir('.')
     pattern = "*.txt"
-    excluded_files = ['negative-words.json', 'neutral-words.json', 'positive-words.txt']
+    excluded_files = ['lexicon.json']
     for entry in list_of_files:
         if fnmatch.fnmatch(entry, pattern):
             if entry not in excluded_files:
@@ -102,26 +102,33 @@ def count_char_words(lexicon, text):
 
 
 # Counting unclassified words
-def count_nochar(argument, number):
+def count_nochar(argument):
+    # Contains list of unique unclassified words in text
+    unique_list = []
     pos = positives
     neg = negatives
 
     stop_words = ['-', ',', '(', ')']
     a = [a for a in argument if a.lower() not in pos and a.lower() not in neg and a.lower() not in stop_words]
-    print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
+    # print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
+    for unique in a:
+        if unique not in unique_list:
+            unique_list.append(unique)
+
     z = 0
     for word in argument:
         if word not in pos:
             if word not in neg:
                 z += 1
-    return z
+
+    return z, unique_list
 
 
 # Counting words in text
 def count_words(argument):
     """
     Counts words in the splitted text
-    :param argument: tuple str
+    :param argument: list str
     :return: int
     """
     return len(argument)
@@ -189,3 +196,4 @@ def adding(word, leks):
 
 if __name__ == '__main__':
     pass
+
