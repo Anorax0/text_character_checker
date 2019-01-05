@@ -5,6 +5,8 @@ from time import time
 chosen_text = None
 opt = None
 
+global f, file_text, file, text
+
 if not chosen_text:
     try:
         with open(str(search_for_text()), 'r', encoding='UTF-8') as file:

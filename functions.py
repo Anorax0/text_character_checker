@@ -42,7 +42,7 @@ def search_for_text():
         if fnmatch.fnmatch(entry, pattern):
             if entry not in excluded_files:
                 print(entry)
-    choosen_text = input('Which one do you what to work with?')
+    choosen_text = input('Which one do you want to work with?')
     if choosen_text in excluded_files:
         exit('Permission denied. Program closed.')
     return str(choosen_text)
@@ -105,12 +105,12 @@ def count_char_words(lexicon, text):
 def count_nochar(argument):
     # Contains list of unique unclassified words in text
     unique_list = []
+
     pos = positives
     neg = negatives
 
     stop_words = ['-', ',', '(', ')']
     a = [a for a in argument if a.lower() not in pos and a.lower() not in neg and a.lower() not in stop_words]
-    # print(f'10 first unclassified words: {", ".join(list(set(a[:number])))}')
     for unique in a:
         if unique not in unique_list:
             unique_list.append(unique)
@@ -196,4 +196,3 @@ def adding(word, leks):
 
 if __name__ == '__main__':
     pass
-
